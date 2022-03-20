@@ -10,20 +10,60 @@
 @import AVKit;
 
 #import "ImageExportController.h"
+#import "ControlsView.h"
 
 @interface Document ()
 {
 	float whRatio,wExtra,hExtra;
 }
+@property (weak) IBOutlet NSSlider *timeSlider;
+@property (strong) IBOutlet ControlsView *controlsView;
 @property (weak) IBOutlet AVPlayerView *playerView;
+@property (weak) IBOutlet NSTextField *playSecs;
+@property (weak) IBOutlet NSTextField *secsLeft;
+@property (strong) IBOutlet NSPanel *previewWindow;
+@property (weak) IBOutlet NSImageView *preView;
 @property AVPlayer *player;
 @property NSArray *chapterMetadataGroups;
 @property NSURL *exportDirectory;
+@property NSArray *thumbnails;
 
 @end
 
 @implementation Document
 
+-(void)setUpControlsView
+{
+	NSView *sup = [self.playerView superview];
+	self.controlsView.autoresizingMask = NSViewWidthSizable;
+	[sup addSubview:self.controlsView];
+	CGRect frame = [self.controlsView frame];
+	CGRect superBounds = [sup bounds];
+	frame.origin.y = 0;
+	frame.origin.x = 0;
+	frame.size.width = superBounds.size.width;
+	[self.controlsView setFrame:frame];
+	[[self.controlsView layer]setBackgroundColor:[[NSColor colorWithWhite:0 alpha:0.5]CGColor]];
+}
+
+- (IBAction)sliderHit:(id)sender
+{
+	CGFloat val = [sender doubleValue];
+	CGFloat secs = val * CMTimeGetSeconds(self.player.currentItem.duration);
+	[self.player seekToTime:CMTimeMakeWithSeconds(secs, 600)];
+}
+
+NSString* secsToHms(CGFloat secs)
+{
+	NSString *sgn = secs < 0?@"-":@"";
+	secs = fabs(secs);
+	int intsecs = secs;
+	int mm = intsecs / 60;
+	int ss = intsecs % 60;
+	int hh = mm / 60;
+	mm = mm % 60;
+	return [NSString stringWithFormat:@"%@%01d:%02d:%02d",sgn,hh,mm,ss];
+}
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)windowController
 {
@@ -31,6 +71,19 @@
 	
 	// Associate AVPlayer with AVPlayerView once the NIB is loaded
 	self.playerView.player = _player;
+	self.playerView.controlsStyle = AVPlayerViewControlsStyleNone;
+	[self setUpControlsView];
+	__weak Document *weakself = self;
+	[self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1, 600) queue:NULL usingBlock:^(CMTime time) {
+		CGFloat secs = CMTimeGetSeconds(time);
+		CGFloat duration = CMTimeGetSeconds(weakself.player.currentItem.duration);
+		[weakself.playSecs setStringValue:secsToHms(secs)];
+		[weakself.secsLeft setStringValue:secsToHms(secs-duration)];
+		[weakself.timeSlider setFloatValue:secs/duration];
+	}];
+	self.controlsView.mouseMoveBlock = ^(CGFloat f){
+		[weakself showPreviewForFraction:f];
+	};
 }
 
 -(void)updateSizes
@@ -65,12 +118,70 @@
     }
 }
 
+-(void)loadThumbnails:(AVAsset*)asset
+{
+	NSMutableArray *thumbs = [NSMutableArray array];
+	self.thumbnails = thumbs;
+	AVAssetImageGenerator *igen = [[AVAssetImageGenerator alloc]initWithAsset:asset];
+	igen.maximumSize = CGSizeMake(128, 128);
+	CMTime cmduration = asset.duration;
+	double durationsecs = CMTimeGetSeconds(cmduration);
+	NSInteger numFrames = 60;
+	NSMutableArray *times = [NSMutableArray array];
+	for (NSInteger i = 0;i < numFrames;i++)
+	{
+		double secs = durationsecs / numFrames * i;
+		CMTime cm = CMTimeMakeWithSeconds(secs, cmduration.timescale);
+		[times addObject:[NSValue valueWithCMTime:cm]];
+	}
+	[igen generateCGImagesAsynchronouslyForTimes:times completionHandler:^(CMTime requestedTime, CGImageRef  _Nullable image, CMTime actualTime, AVAssetImageGeneratorResult result, NSError * _Nullable error) {
+		if (result == AVAssetImageGeneratorSucceeded)
+		{
+			NSInteger w = CGImageGetWidth(image);
+			NSInteger h = CGImageGetHeight(image);
+			NSImage *im = [[NSImage alloc]initWithCGImage:image size:CGSizeMake(w, h)];
+			[thumbs addObject:im];
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self.preView setImage:im];
+			});
+		}
+		else
+		{
+			NSLog(@"%@",error.localizedDescription);
+		}
+	}];
+}
+
+NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
+{
+	if (val <= from)
+		return from;
+	if (val >= to)
+		return to;
+	return val;
+}
+
+-(void)showPreviewForFraction:(CGFloat)frac
+{
+	if ([_thumbnails count] > 0)
+	{
+		NSInteger idx = clampint(0, [_thumbnails count] - 1,round(frac * [_thumbnails count]));
+		NSLog(@"%g %d",frac,idx);
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self.preView setImage:_thumbnails[idx]];
+		});
+	}
+}
+
 - (BOOL)readFromURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError
 {
 	_player = [AVPlayer playerWithURL:absoluteURL];
 	
 	[self.player.currentItem.asset loadValuesAsynchronouslyForKeys:@[@"tracks"] completionHandler:^{
-        [self setWindowToNaturalSize];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self setWindowToNaturalSize];
+			[self loadThumbnails:self.player.currentItem.asset];
+		});
 	}];
 	// Load chapters to be used by the next/previous chapter menu items
 	[_player.currentItem.asset loadValuesAsynchronouslyForKeys:@[@"availableChapterLocales"] completionHandler:^{
@@ -145,6 +256,7 @@
 	CMTime ct = [self.player currentTime];
 	ct = CMTimeMakeWithSeconds(CMTimeGetSeconds(ct) - 10, ct.timescale);
 	[self.player seekToTime:ct];
+	[self.controlsView flash];
 }
 
 - (IBAction)jumpForward:(id)sender
@@ -152,6 +264,7 @@
 	CMTime ct = [self.player currentTime];
 	ct = CMTimeMakeWithSeconds(CMTimeGetSeconds(ct) + 20, ct.timescale);
 	[self.player seekToTime:ct];
+	[self.controlsView flash];
 }
 
 - (void)windowDidResize:(NSNotification *)notification
