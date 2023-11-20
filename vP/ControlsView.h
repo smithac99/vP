@@ -7,13 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "Document.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface ControlsView : NSView
 
-@property void (^mouseMoveBlock)(CGFloat);
-
+@property void (^mouseMoveBlock)(CGPoint);
+@property  (weak) IBOutlet Document *document;
 -(void)show:(BOOL)sh;
 -(void)flash;
 @end

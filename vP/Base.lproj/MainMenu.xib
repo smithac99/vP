@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -184,10 +184,16 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Navigate" id="GEO-Iw-cKr">
                         <items>
-                            <menuItem title="Faster" keyEquivalent="=" id="EwT-vu-rox">
+                            <menuItem title="Play" keyEquivalent=" " id="EwT-vu-rox">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="doFaster:" target="-1" id="ZzJ-nO-5oc"/>
+                                    <action selector="playHit:" target="-1" id="Bdy-dI-qfs"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Faster" keyEquivalent="=" id="u7w-7J-F5W">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="doFaster:" target="-1" id="NCK-b3-XV6"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Slower" keyEquivalent="-" id="VMv-9b-iUx">
@@ -196,16 +202,48 @@
                                     <action selector="doSlower:" target="-1" id="UZz-XR-OYE"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="A6d-IB-3A3"/>
                             <menuItem title="Jump Forward" keyEquivalent="n" id="23Y-XV-eED">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="jumpForward:" target="-1" id="m6e-mT-9hY"/>
+                                    <action selector="jumpForwardLittle:" target="-1" id="g9Z-CR-L5V"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Jump Forward Big" keyEquivalent="m" id="1cv-T8-A1a">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="jumpForward:" target="-1" id="Yko-5N-eqw"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Jump Back" keyEquivalent="b" id="72C-tB-9zL">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="jumpBack:" target="-1" id="5YV-KR-gjO"/>
+                                    <action selector="jumpBackLittle:" target="-1" id="bVA-Fn-qYF"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Jump Back Big" keyEquivalent="v" id="er5-f3-RH6">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="jumpBack:" target="-1" id="VYF-tQ-lLk"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Go to Start" keyEquivalent="" id="0V9-7a-BT7">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="jumpBack:" target="-1" id="kt4-O2-nRC"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="qOr-Em-Ce1"/>
+                            <menuItem title="Step Forward" keyEquivalent="" id="wt0-O4-Ydq">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="stepForward:" target="-1" id="GT2-zt-i9q"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Step Back" keyEquivalent="" id="QLs-zj-114">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="stepBack:" target="-1" id="iDF-dY-AEr"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Reverse" keyEquivalent="r" id="Otk-Gb-LFG">
@@ -262,6 +300,12 @@
                                     <action selector="halfSize:" target="-1" id="bov-Op-jiX"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Centre" keyEquivalent="c" id="jHo-1i-kXG">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="centreWindow:" target="-1" id="b69-wn-cRc"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="ihK-Ze-4hi"/>
                             <menuItem title="Enter Full Screen" keyEquivalent="0" id="vNm-F2-Igg">
                                 <connections>
@@ -309,6 +353,7 @@
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="139" y="-56"/>
         </menu>
         <menuItem title="Reverse" keyEquivalent="r" id="OTQ-M2-sXa">
             <modifierMask key="keyEquivalentModifierMask"/>

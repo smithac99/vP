@@ -19,6 +19,7 @@
 		E78559801DE6F63800915BFE /* ImageExportController.mm in Sources */ = {isa = PBXBuildFile; fileRef = E785597F1DE6F63800915BFE /* ImageExportController.mm */; };
 		E7D21B0627E7437C00C493F2 /* ControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D21B0527E7437C00C493F2 /* ControlsView.m */; };
 		E7D21B0927E785B200C493F2 /* VPWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D21B0827E785B200C493F2 /* VPWindow.m */; };
+		E7D21B0C27E7A38B00C493F2 /* VPContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D21B0B27E7A38B00C493F2 /* VPContentView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,8 @@
 		E7D21B0527E7437C00C493F2 /* ControlsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ControlsView.m; sourceTree = "<group>"; };
 		E7D21B0727E785B200C493F2 /* VPWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VPWindow.h; sourceTree = "<group>"; };
 		E7D21B0827E785B200C493F2 /* VPWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VPWindow.m; sourceTree = "<group>"; };
+		E7D21B0A27E7A38B00C493F2 /* VPContentView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VPContentView.h; sourceTree = "<group>"; };
+		E7D21B0B27E7A38B00C493F2 /* VPContentView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VPContentView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +87,8 @@
 				E764B3591BDBD8F600DC337D /* Document.xib */,
 				E7D21B0727E785B200C493F2 /* VPWindow.h */,
 				E7D21B0827E785B200C493F2 /* VPWindow.m */,
+				E7D21B0A27E7A38B00C493F2 /* VPContentView.h */,
+				E7D21B0B27E7A38B00C493F2 /* VPContentView.m */,
 				E7D21B0427E7437C00C493F2 /* ControlsView.h */,
 				E7D21B0527E7437C00C493F2 /* ControlsView.m */,
 				E764B35C1BDBD8F600DC337D /* Assets.xcassets */,
@@ -180,6 +185,7 @@
 				E764B3581BDBD8F600DC337D /* Document.m in Sources */,
 				E78559801DE6F63800915BFE /* ImageExportController.mm in Sources */,
 				E7D21B0627E7437C00C493F2 /* ControlsView.m in Sources */,
+				E7D21B0C27E7A38B00C493F2 /* VPContentView.m in Sources */,
 				E7D21B0927E785B200C493F2 /* VPWindow.m in Sources */,
 				E764B3551BDBD8F600DC337D /* main.m in Sources */,
 				E764B3521BDBD8F600DC337D /* AppDelegate.m in Sources */,

@@ -17,13 +17,16 @@
 	float whRatio,wExtra,hExtra;
 }
 @property (weak) IBOutlet NSSlider *timeSlider;
+@property (strong) IBOutlet NSWindow *mainWindow;
 @property (strong) IBOutlet ControlsView *controlsView;
-@property (weak) IBOutlet AVPlayerView *playerView;
 @property (weak) IBOutlet NSTextField *playSecs;
 @property (weak) IBOutlet NSTextField *secsLeft;
 @property (strong) IBOutlet NSPanel *previewWindow;
 @property (weak) IBOutlet NSImageView *preView;
 @property AVPlayer *player;
+@property (weak) IBOutlet NSView *playerView;
+
+@property AVPlayerLayer *playerLayer;
 @property NSArray *chapterMetadataGroups;
 @property NSURL *exportDirectory;
 @property NSArray *thumbnails;
@@ -32,9 +35,14 @@
 
 @implementation Document
 
+-(void)dealloc
+{
+	[_previewWindow orderOut:self];
+}
+
 -(void)setUpControlsView
 {
-	NSView *sup = [self.playerView superview];
+	NSView *sup = [self.mainWindow contentView];
 	self.controlsView.autoresizingMask = NSViewWidthSizable;
 	[sup addSubview:self.controlsView];
 	CGRect frame = [self.controlsView frame];
@@ -53,6 +61,13 @@
 	[self.player seekToTime:CMTimeMakeWithSeconds(secs, 600)];
 }
 
+- (IBAction)playHit:(id)sender
+{
+	if (self.player.rate == 0.0)
+		[self.player play];
+	else
+		self.player.rate = 0.0;
+}
 NSString* secsToHms(CGFloat secs)
 {
 	NSString *sgn = secs < 0?@"-":@"";
@@ -65,14 +80,18 @@ NSString* secsToHms(CGFloat secs)
 	return [NSString stringWithFormat:@"%@%01d:%02d:%02d",sgn,hh,mm,ss];
 }
 
+
 - (void)windowControllerDidLoadNib:(NSWindowController *)windowController
 {
 	[super windowControllerDidLoadNib:windowController];
 	
-	// Associate AVPlayer with AVPlayerView once the NIB is loaded
-	self.playerView.player = _player;
-	self.playerView.controlsStyle = AVPlayerViewControlsStyleNone;
+	self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
+	self.playerLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
+	self.mainWindow.contentView.wantsLayer = YES;
+	[self.playerLayer setFrame:self.mainWindow.contentView.bounds];
+	[self.mainWindow.contentView.layer addSublayer:self.playerLayer];
 	[self setUpControlsView];
+	[self.previewWindow setLevel:NSFloatingWindowLevel];
 	__weak Document *weakself = self;
 	[self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1, 600) queue:NULL usingBlock:^(CMTime time) {
 		CGFloat secs = CMTimeGetSeconds(time);
@@ -81,9 +100,19 @@ NSString* secsToHms(CGFloat secs)
 		[weakself.secsLeft setStringValue:secsToHms(secs-duration)];
 		[weakself.timeSlider setFloatValue:secs/duration];
 	}];
-	self.controlsView.mouseMoveBlock = ^(CGFloat f){
-		[weakself showPreviewForFraction:f];
+	self.controlsView.mouseMoveBlock = ^(CGPoint windowLoc){
+		NSPoint coord = [weakself.timeSlider convertPoint:windowLoc fromView:nil];
+		[weakself showPreviewForFraction:coord.x / [weakself.timeSlider frame].size.width];
+		coord = [weakself.timeSlider convertPoint:coord toView:self.controlsView];
+		coord.y = [weakself.controlsView bounds].size.height;
+		coord = [weakself.controlsView convertPoint:coord toView:nil];
+		coord = [weakself.mainWindow convertPointToScreen:coord];
+		coord.x -= [self.previewWindow frame].size.width / 2;
+		[weakself.previewWindow setFrameOrigin:coord];
 	};
+	[self.previewWindow setBackgroundColor:[NSColor clearColor]];
+	[self.previewWindow setOpaque:0.0];
+
 }
 
 -(void)updateSizes
@@ -123,10 +152,10 @@ NSString* secsToHms(CGFloat secs)
 	NSMutableArray *thumbs = [NSMutableArray array];
 	self.thumbnails = thumbs;
 	AVAssetImageGenerator *igen = [[AVAssetImageGenerator alloc]initWithAsset:asset];
-	igen.maximumSize = CGSizeMake(128, 128);
+	igen.maximumSize = CGSizeMake(256, 256);
 	CMTime cmduration = asset.duration;
 	double durationsecs = CMTimeGetSeconds(cmduration);
-	NSInteger numFrames = 60;
+	NSInteger numFrames = 120;
 	NSMutableArray *times = [NSMutableArray array];
 	for (NSInteger i = 0;i < numFrames;i++)
 	{
@@ -166,7 +195,6 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 	if ([_thumbnails count] > 0)
 	{
 		NSInteger idx = clampint(0, [_thumbnails count] - 1,round(frac * [_thumbnails count]));
-		NSLog(@"%g %d",frac,idx);
 		dispatch_async(dispatch_get_main_queue(), ^{
 			[self.preView setImage:_thumbnails[idx]];
 		});
@@ -259,10 +287,26 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 	[self.controlsView flash];
 }
 
+- (IBAction)jumpBackLittle:(id)sender
+{
+	CMTime ct = [self.player currentTime];
+	ct = CMTimeMakeWithSeconds(CMTimeGetSeconds(ct) - 5, ct.timescale);
+	[self.player seekToTime:ct];
+	[self.controlsView flash];
+}
+
 - (IBAction)jumpForward:(id)sender
 {
 	CMTime ct = [self.player currentTime];
 	ct = CMTimeMakeWithSeconds(CMTimeGetSeconds(ct) + 20, ct.timescale);
+	[self.player seekToTime:ct];
+	[self.controlsView flash];
+}
+
+- (IBAction)jumpForwardLittle:(id)sender
+{
+	CMTime ct = [self.player currentTime];
+	ct = CMTimeMakeWithSeconds(CMTimeGetSeconds(ct) + 4, ct.timescale);
 	[self.player seekToTime:ct];
 	[self.controlsView flash];
 }
@@ -372,6 +416,11 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 	[[self.playerView window] setContentSize:sz];
 }
 
+-(IBAction)centreWindow:(id)sender
+{
+	[[self.playerView window]center];
+}
+
 -(IBAction)makeQuieter:(id)sender
 {
 	float v = self.player.volume;
@@ -386,5 +435,30 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 	else
 		self.player.volume = v * 1.1;
 	
+}
+
+-(void)showPreviewWindow:(BOOL)sh
+{
+	if (sh)
+		[self.previewWindow orderFront:self];
+	else
+		[self.previewWindow orderOut:self];
+}
+
+- (IBAction)stepForward:(id)sender
+{
+	[self.player.currentItem stepByCount:1];
+}
+- (IBAction)stepBack:(id)sender
+{
+	[self.player.currentItem stepByCount:-1];
+}
+
+- (void)shouldCloseWindowController:(NSWindowController *)windowController delegate:(id)delegate shouldCloseSelector:(SEL)shouldCloseSelector contextInfo:(void *)contextInfo
+{
+	if (self.player.rate != 0)
+		[self.player pause];
+	[_previewWindow orderOut:self];
+	[super shouldCloseWindowController:windowController delegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
 }
 @end

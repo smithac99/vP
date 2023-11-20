@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.AVKitIBPlugin" version="20037"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -11,8 +10,9 @@
             <connections>
                 <outlet property="controlsView" destination="Mu3-1A-1cW" id="Uqm-fE-vda"/>
                 <outlet property="imageExportController" destination="zWD-b8-VAp" id="u3P-JU-054"/>
+                <outlet property="mainWindow" destination="xOd-HO-29H" id="I9O-UX-vrX"/>
                 <outlet property="playSecs" destination="eDp-WA-B2A" id="sVb-Qg-ERI"/>
-                <outlet property="playerView" destination="ulq-YV-7B2" id="gkj-aO-GwH"/>
+                <outlet property="playerView" destination="gIp-Ho-8D9" id="48g-wi-tKI"/>
                 <outlet property="preView" destination="fnV-PQ-oEY" id="1ZJ-dq-K6n"/>
                 <outlet property="previewWindow" destination="3Fa-4B-f4S" id="oQH-iC-L1k"/>
                 <outlet property="secsLeft" destination="krd-VK-5mW" id="myR-TG-6QB"/>
@@ -22,31 +22,20 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="xOd-HO-29H" userLabel="Window" customClass="VPWindow">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="xOd-HO-29H" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="133" y="235" width="733" height="420"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="3840" height="2135"/>
             <value key="minSize" type="size" width="94" height="86"/>
-            <view key="contentView" id="gIp-Ho-8D9">
+            <view key="contentView" id="gIp-Ho-8D9" customClass="VPContentView">
                 <rect key="frame" x="0.0" y="0.0" width="733" height="420"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                <subviews>
-                    <avPlayerView controlsStyle="inline" translatesAutoresizingMaskIntoConstraints="NO" id="ulq-YV-7B2">
-                        <rect key="frame" x="0.0" y="0.0" width="733" height="420"/>
-                    </avPlayerView>
-                </subviews>
-                <constraints>
-                    <constraint firstItem="ulq-YV-7B2" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" id="7bx-rB-dwe"/>
-                    <constraint firstItem="ulq-YV-7B2" firstAttribute="leading" secondItem="gIp-Ho-8D9" secondAttribute="leading" id="MqK-Io-Sm6"/>
-                    <constraint firstAttribute="bottom" secondItem="ulq-YV-7B2" secondAttribute="bottom" id="bgG-P8-8fe"/>
-                    <constraint firstAttribute="trailing" secondItem="ulq-YV-7B2" secondAttribute="trailing" id="deZ-UO-aeV"/>
-                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
-            <point key="canvasLocation" x="252.5" y="113"/>
+            <point key="canvasLocation" x="310" y="72"/>
         </window>
         <customObject id="zWD-b8-VAp" customClass="ImageExportController">
             <connections>
@@ -225,20 +214,23 @@
                 <constraint firstItem="eDp-WA-B2A" firstAttribute="top" secondItem="Mu3-1A-1cW" secondAttribute="top" constant="13" id="jJQ-qa-Ntf"/>
                 <constraint firstItem="krd-VK-5mW" firstAttribute="leading" secondItem="x7N-TX-Orm" secondAttribute="trailing" constant="14" id="sae-Rs-Li3"/>
             </constraints>
+            <connections>
+                <outlet property="document" destination="-2" id="uUR-KN-usW"/>
+            </connections>
             <point key="canvasLocation" x="348" y="540"/>
         </customView>
-        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="3Fa-4B-f4S" customClass="NSPanel">
+        <window allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="3Fa-4B-f4S" customClass="NSPanel">
             <windowStyleMask key="styleMask" utility="YES" nonactivatingPanel="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="272" y="172" width="128" height="128"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="3840" height="2135"/>
             <view key="contentView" id="iQ1-5b-apN">
                 <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fnV-PQ-oEY">
                         <rect key="frame" x="0.0" y="0.0" width="128" height="128"/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="xWm-iS-yOM"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageAlignment="bottom" imageScaling="proportionallyDown" id="xWm-iS-yOM"/>
                     </imageView>
                 </subviews>
                 <constraints>

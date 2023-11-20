@@ -16,6 +16,7 @@
 @property IBOutlet ImageExportController *imageExportController;
 @property NSMutableDictionary *exportImageSettings;
 
+-(void)showPreviewWindow:(BOOL)sh;
 
 @end
 

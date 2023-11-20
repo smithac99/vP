@@ -11,6 +11,7 @@
 @interface ControlsView()
 {
 	NSTrackingRectTag trackingTag;
+	NSTrackingArea *trackingArea;
 }
 @end
 
@@ -27,10 +28,18 @@
 
 -(void)resetSizes
 {
-	if (trackingTag != 0)
-		[self removeTrackingRect:trackingTag];
-	
-	trackingTag = [self addTrackingRect:[self bounds] owner:self userData:NULL assumeInside:NO];
+	//if (trackingTag != 0)
+		//[self removeTrackingRect:trackingTag];
+	if (trackingArea)
+		[self removeTrackingArea:trackingArea];
+	NSTrackingAreaOptions options = (NSTrackingActiveAlways | NSTrackingInVisibleRect |
+							 NSTrackingMouseEnteredAndExited | NSTrackingMouseMoved);
+	NSTrackingArea *area = [[NSTrackingArea alloc] initWithRect:[self bounds]
+														options:options
+														  owner:self
+													   userInfo:nil];
+	[self addTrackingArea:area];
+	//trackingTag = [self addTrackingRect:[self bounds] o owner:self userData:NULL assumeInside:NO];
 }
 
 -(void)boundsChanged:(NSNotification*)notif
@@ -57,11 +66,13 @@
 -(void)mouseExited:(NSEvent *)event
 {
 	[self show:NO];
+	[self.document showPreviewWindow:NO];
 }
 
 -(void)mouseEntered:(NSEvent *)event
 {
 	[self show:YES];
+	[self.document showPreviewWindow:YES];
 }
 
 CGFloat clamp01(CGFloat f)
@@ -79,9 +90,9 @@ CGFloat clamp01(CGFloat f)
 {
 	if (self.mouseMoveBlock)
 	{
-		NSPoint coord = [self convertPoint:[event locationInWindow] fromView:nil];
-		CGFloat frac = clamp01(coord.x / self.bounds.size.width);
-		self.mouseMoveBlock(frac);
+		//NSPoint coord = [self convertPoint:[event locationInWindow] fromView:nil];
+		//CGFloat frac = clamp01(coord.x / self.bounds.size.width);
+		self.mouseMoveBlock([event locationInWindow]);
 	}
 }
 @end
