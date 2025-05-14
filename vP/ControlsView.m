@@ -24,6 +24,7 @@
 	[self setPostsFrameChangedNotifications:YES];
 	[[self window]setAcceptsMouseMovedEvents:YES];
 	[self resetSizes];
+	[self checkMouse];
 }
 
 -(void)resetSizes
@@ -57,7 +58,7 @@
 	if (self.alphaValue == 0.0)
 	{
 		[self show:YES];
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 			[self show:NO];
 		});
 	}
@@ -75,6 +76,20 @@
 	[self.document showPreviewWindow:YES];
 }
 
+-(void)checkMouse
+{
+	NSPoint mpt = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream]fromView:nil];
+	if (NSPointInRect(mpt, [self bounds]))
+	{
+		[self show:YES];
+		[self.document showPreviewWindow:YES];
+	}
+	else
+	{
+		[self show:NO];
+		[self.document showPreviewWindow:NO];
+	}
+}
 CGFloat clamp01(CGFloat f)
 {
 	if (f > 0)

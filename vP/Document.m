@@ -56,9 +56,12 @@
 
 - (IBAction)sliderHit:(id)sender
 {
+	float rt = self.player.rate;
+	self.player.rate = 0;
 	CGFloat val = [sender doubleValue];
 	CGFloat secs = val * CMTimeGetSeconds(self.player.currentItem.duration);
 	[self.player seekToTime:CMTimeMakeWithSeconds(secs, 600)];
+	self.player.rate = rt;
 }
 
 - (IBAction)playHit:(id)sender
@@ -80,6 +83,28 @@ NSString* secsToHms(CGFloat secs)
 	return [NSString stringWithFormat:@"%@%01d:%02d:%02d",sgn,hh,mm,ss];
 }
 
+NSString* secsToHmst(CGFloat secs)
+{
+	NSString *sgn = secs < 0?@"-":@"";
+	secs = fabs(secs);
+	int intsecs = secs;
+	int mm = intsecs / 60;
+	int ss = intsecs % 60;
+	int hh = mm / 60;
+	mm = mm % 60;
+	CGFloat frac = secs - intsecs;
+	int t = frac * 1000;
+	return [NSString stringWithFormat:@"%@%01d:%02d:%02d.%003d",sgn,hh,mm,ss,t];
+}
+
+
+-(void)updateTimes:(CGFloat)secs
+{
+	CGFloat duration = CMTimeGetSeconds(self.player.currentItem.duration);
+	[self.playSecs setStringValue:secsToHmst(secs)];
+	[self.secsLeft setStringValue:secsToHmst(secs-duration)];
+	[self.timeSlider setFloatValue:secs/duration];
+}
 
 - (void)windowControllerDidLoadNib:(NSWindowController *)windowController
 {
@@ -93,12 +118,9 @@ NSString* secsToHms(CGFloat secs)
 	[self setUpControlsView];
 	[self.previewWindow setLevel:NSFloatingWindowLevel];
 	__weak Document *weakself = self;
-	[self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(1, 600) queue:NULL usingBlock:^(CMTime time) {
+	[self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(0.1, 600) queue:NULL usingBlock:^(CMTime time) {
 		CGFloat secs = CMTimeGetSeconds(time);
-		CGFloat duration = CMTimeGetSeconds(weakself.player.currentItem.duration);
-		[weakself.playSecs setStringValue:secsToHms(secs)];
-		[weakself.secsLeft setStringValue:secsToHms(secs-duration)];
-		[weakself.timeSlider setFloatValue:secs/duration];
+		[weakself updateTimes:secs];
 	}];
 	self.controlsView.mouseMoveBlock = ^(CGPoint windowLoc){
 		NSPoint coord = [weakself.timeSlider convertPoint:windowLoc fromView:nil];
@@ -112,7 +134,7 @@ NSString* secsToHms(CGFloat secs)
 	};
 	[self.previewWindow setBackgroundColor:[NSColor clearColor]];
 	[self.previewWindow setOpaque:0.0];
-
+	[self updateTimes:0];
 }
 
 -(void)updateSizes
