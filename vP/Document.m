@@ -11,6 +11,7 @@
 
 #import "ImageExportController.h"
 #import "ControlsView.h"
+#import "SleepPreventer.h"
 
 @interface Document ()
 {
@@ -25,6 +26,7 @@
 @property (weak) IBOutlet NSImageView *preView;
 @property AVPlayer *player;
 @property (weak) IBOutlet NSView *playerView;
+@property SleepPreventer *sleepPreventer;
 
 @property AVPlayerLayer *playerLayer;
 @property NSArray *chapterMetadataGroups;
@@ -64,13 +66,28 @@
 	self.player.rate = rt;
 }
 
+-(void)startPlay
+{
+    self.sleepPreventer = [[SleepPreventer alloc] init];
+    [self.sleepPreventer beginPreventingSleep];
+    [self.player play];
+}
+
+-(void)stopPlay
+{
+    [self.sleepPreventer endPreventingSleep];
+    self.sleepPreventer = nil;
+    self.player.rate = 0.0;
+}
+
 - (IBAction)playHit:(id)sender
 {
 	if (self.player.rate == 0.0)
-		[self.player play];
+        [self startPlay];
 	else
-		self.player.rate = 0.0;
+        [self stopPlay];
 }
+
 NSString* secsToHms(CGFloat secs)
 {
 	NSString *sgn = secs < 0?@"-":@"";

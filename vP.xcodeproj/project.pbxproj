@@ -17,6 +17,7 @@
 		E764B36D1BDC088400DC337D /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E764B36B1BDC088400DC337D /* AVKit.framework */; };
 		E764B36F1BDC456E00DC337D /* eye.icns in Resources */ = {isa = PBXBuildFile; fileRef = E764B36E1BDC456E00DC337D /* eye.icns */; };
 		E78559801DE6F63800915BFE /* ImageExportController.mm in Sources */ = {isa = PBXBuildFile; fileRef = E785597F1DE6F63800915BFE /* ImageExportController.mm */; };
+		E7BAAAFA2E645D3900ADA282 /* SleepPreventer.m in Sources */ = {isa = PBXBuildFile; fileRef = E7BAAAF92E645D3900ADA282 /* SleepPreventer.m */; };
 		E7D21B0627E7437C00C493F2 /* ControlsView.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D21B0527E7437C00C493F2 /* ControlsView.m */; };
 		E7D21B0927E785B200C493F2 /* VPWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D21B0827E785B200C493F2 /* VPWindow.m */; };
 		E7D21B0C27E7A38B00C493F2 /* VPContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = E7D21B0B27E7A38B00C493F2 /* VPContentView.m */; };
@@ -38,6 +39,8 @@
 		E764B36E1BDC456E00DC337D /* eye.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = eye.icns; sourceTree = "<group>"; };
 		E785597E1DE6F63800915BFE /* ImageExportController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageExportController.h; sourceTree = "<group>"; };
 		E785597F1DE6F63800915BFE /* ImageExportController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageExportController.mm; sourceTree = "<group>"; };
+		E7BAAAF82E645D3900ADA282 /* SleepPreventer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SleepPreventer.h; sourceTree = "<group>"; };
+		E7BAAAF92E645D3900ADA282 /* SleepPreventer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SleepPreventer.m; sourceTree = "<group>"; };
 		E7D21B0427E7437C00C493F2 /* ControlsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ControlsView.h; sourceTree = "<group>"; };
 		E7D21B0527E7437C00C493F2 /* ControlsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ControlsView.m; sourceTree = "<group>"; };
 		E7D21B0727E785B200C493F2 /* VPWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VPWindow.h; sourceTree = "<group>"; };
@@ -84,6 +87,8 @@
 				E764B3511BDBD8F600DC337D /* AppDelegate.m */,
 				E764B3561BDBD8F600DC337D /* Document.h */,
 				E764B3571BDBD8F600DC337D /* Document.m */,
+				E7BAAAF82E645D3900ADA282 /* SleepPreventer.h */,
+				E7BAAAF92E645D3900ADA282 /* SleepPreventer.m */,
 				E764B3591BDBD8F600DC337D /* Document.xib */,
 				E7D21B0727E785B200C493F2 /* VPWindow.h */,
 				E7D21B0827E785B200C493F2 /* VPWindow.m */,
@@ -189,6 +194,7 @@
 				E7D21B0927E785B200C493F2 /* VPWindow.m in Sources */,
 				E764B3551BDBD8F600DC337D /* main.m in Sources */,
 				E764B3521BDBD8F600DC337D /* AppDelegate.m in Sources */,
+				E7BAAAFA2E645D3900ADA282 /* SleepPreventer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
