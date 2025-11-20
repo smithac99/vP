@@ -10,6 +10,7 @@
                 <outlet property="controlsView" destination="Mu3-1A-1cW" id="Uqm-fE-vda"/>
                 <outlet property="imageExportController" destination="zWD-b8-VAp" id="u3P-JU-054"/>
                 <outlet property="mainWindow" destination="xOd-HO-29H" id="I9O-UX-vrX"/>
+                <outlet property="pickerHome" destination="oGC-Gc-X1D" id="UNR-iA-F8f"/>
                 <outlet property="playSecs" destination="eDp-WA-B2A" id="sVb-Qg-ERI"/>
                 <outlet property="playerView" destination="gIp-Ho-8D9" id="48g-wi-tKI"/>
                 <outlet property="preView" destination="fnV-PQ-oEY" id="1ZJ-dq-K6n"/>
@@ -240,6 +241,32 @@
                 </constraints>
             </view>
             <point key="canvasLocation" x="376" y="707"/>
+        </window>
+        <window title="Airplay" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" frameAutosaveName="" animationBehavior="default" id="OEM-bx-amZ" customClass="NSPanel">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="272" y="172" width="276" height="118"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
+            <view key="contentView" id="93K-bp-7xF">
+                <rect key="frame" x="0.0" y="0.0" width="276" height="118"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="oGC-Gc-X1D">
+                        <rect key="frame" x="20" y="20" width="236" height="78"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="78" id="04m-bV-6Yq"/>
+                            <constraint firstAttribute="width" constant="236" id="uS9-4t-gcN"/>
+                        </constraints>
+                    </customView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="oGC-Gc-X1D" secondAttribute="bottom" constant="20" symbolic="YES" id="6oT-zj-nc3"/>
+                    <constraint firstAttribute="trailing" secondItem="oGC-Gc-X1D" secondAttribute="trailing" constant="20" symbolic="YES" id="EO8-tv-mjE"/>
+                    <constraint firstItem="oGC-Gc-X1D" firstAttribute="leading" secondItem="93K-bp-7xF" secondAttribute="leading" constant="20" symbolic="YES" id="Gez-ha-9kc"/>
+                    <constraint firstItem="oGC-Gc-X1D" firstAttribute="top" secondItem="93K-bp-7xF" secondAttribute="top" constant="20" symbolic="YES" id="YSZ-Qz-52l"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="398" y="715"/>
         </window>
     </objects>
 </document>

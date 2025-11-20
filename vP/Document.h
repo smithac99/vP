@@ -8,13 +8,16 @@
 
 @import Cocoa;
 @import AVFoundation;
+@import AVKit;
 
 @class ImageExportController;
 
-@interface Document : NSDocument
+@interface Document : NSDocument<AVRoutePickerViewDelegate>
 
 @property IBOutlet ImageExportController *imageExportController;
 @property NSMutableDictionary *exportImageSettings;
+@property (weak) IBOutlet NSView *pickerHome;
+@property AVRoutePickerView *routePickerView;
 
 -(void)showPreviewWindow:(BOOL)sh;
 

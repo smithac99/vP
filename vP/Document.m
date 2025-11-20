@@ -152,6 +152,12 @@ NSString* secsToHmst(CGFloat secs)
 	[self.previewWindow setBackgroundColor:[NSColor clearColor]];
 	[self.previewWindow setOpaque:0.0];
 	[self updateTimes:0];
+    _routePickerView = [[AVRoutePickerView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+    _routePickerView.delegate = self;
+    //_routePickerView.player = self.player;
+    [self.pickerHome addSubview:_routePickerView];
+    self.player.allowsExternalPlayback = YES;
+    //self.player.usesExternalPlaybackWhileExternalScreenIsActive = YES;
 }
 
 -(void)updateSizes
