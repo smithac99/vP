@@ -12,6 +12,7 @@
 #import "ImageExportController.h"
 #import "ControlsView.h"
 #import "SleepPreventer.h"
+#import "SubtitleCue.h"
 
 @interface Document ()
 {
@@ -29,10 +30,13 @@
 @property SleepPreventer *sleepPreventer;
 
 @property AVPlayerLayer *playerLayer;
+@property CATextLayer *subtitleLayer;
+@property CAShapeLayer *subTitleProgressLayer;
 @property NSArray *chapterMetadataGroups;
 @property NSURL *exportDirectory;
 @property NSArray *thumbnails;
-
+@property NSArray<SubtitleCue*>* subtitleCues;
+@property id timeObserver;
 @end
 
 @implementation Document
@@ -40,6 +44,8 @@
 -(void)dealloc
 {
 	[_previewWindow orderOut:self];
+    [self.player removeTimeObserver:self.timeObserver];
+    self.timeObserver = nil;
 }
 
 -(void)setUpControlsView
@@ -132,12 +138,52 @@ NSString* secsToHmst(CGFloat secs)
 	self.mainWindow.contentView.wantsLayer = YES;
 	[self.playerLayer setFrame:self.mainWindow.contentView.bounds];
 	[self.mainWindow.contentView.layer addSublayer:self.playerLayer];
+    
+    self.subtitleLayer = [CATextLayer layer];
+    self.subtitleLayer.autoresizingMask = kCALayerWidthSizable|kCALayerMaxYMargin;
+    CGRect bnds = self.mainWindow.contentView.bounds;
+    bnds = CGRectInset(bnds, 100, 0);
+    bnds.origin.y = 40;
+    bnds.size.height = 100;
+    [self.subtitleLayer setFrame:bnds];
+    self.subtitleLayer.alignmentMode = kCAAlignmentCenter;
+    self.subtitleLayer.foregroundColor = NSColor.whiteColor.CGColor;
+    self.subtitleLayer.backgroundColor = NSColor.clearColor.CGColor;
+    self.subtitleLayer.shadowOpacity = 0.6;
+    self.subtitleLayer.shadowRadius = 1.0;
+    self.subtitleLayer.fontSize = 30;
+    self.subtitleLayer.wrapped = YES;
+    [self.mainWindow.contentView.layer addSublayer:self.subtitleLayer];
+
+    self.subTitleProgressLayer = [CAShapeLayer layer];
+    self.subTitleProgressLayer.autoresizingMask = kCALayerMaxXMargin|kCALayerMinXMargin|kCALayerMaxYMargin;
+    bnds = self.mainWindow.contentView.bounds;
+    bnds = CGRectInset(bnds, (bnds.size.width - 400) / 2.0, 0);
+    bnds.origin.y = 20;
+    bnds.size.height = 20;
+    [self.subTitleProgressLayer setFrame:bnds];
+    self.subTitleProgressLayer.cornerRadius = 8;
+    self.subTitleProgressLayer.masksToBounds = YES;
+    self.subTitleProgressLayer.borderWidth = 2;
+    self.subTitleProgressLayer.borderColor = NSColor.blackColor.CGColor;
+    self.subTitleProgressLayer.backgroundColor = NSColor.whiteColor.CGColor;
+    self.subTitleProgressLayer.strokeColor = NSColor.redColor.CGColor;
+    self.subTitleProgressLayer.lineWidth = 20;
+    NSBezierPath *path = [NSBezierPath bezierPath];
+    [path moveToPoint:NSMakePoint(0,10)];
+    [path lineToPoint:NSMakePoint(bnds.size.width, 10)];
+    self.subTitleProgressLayer.path = path.CGPath;
+    self.subTitleProgressLayer.strokeEnd = 0.75;
+    [self.subTitleProgressLayer setHidden:YES];
+    [self.mainWindow.contentView.layer addSublayer:self.subTitleProgressLayer];
+    
 	[self setUpControlsView];
 	[self.previewWindow setLevel:NSFloatingWindowLevel];
 	__weak Document *weakself = self;
-	[self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(0.1, 600) queue:NULL usingBlock:^(CMTime time) {
+    self.timeObserver = [self.player addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(0.01, 600) queue:NULL usingBlock:^(CMTime time) {
 		CGFloat secs = CMTimeGetSeconds(time);
 		[weakself updateTimes:secs];
+        [weakself updateSubtitleForTime:time];
 	}];
 	self.controlsView.mouseMoveBlock = ^(CGPoint windowLoc){
 		NSPoint coord = [weakself.timeSlider convertPoint:windowLoc fromView:nil];
@@ -505,5 +551,121 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 		[self.player pause];
 	[_previewWindow orderOut:self];
 	[super shouldCloseWindowController:windowController delegate:delegate shouldCloseSelector:shouldCloseSelector contextInfo:contextInfo];
+}
+
+#pragma mark -
+
+- (void)loadSubtitlesFromURL:(NSURL *)srtURL
+{
+    self.subtitleCues = [SubtitleCue parseSRTAtURL:srtURL];
+}
+
+void DoBlockWithScreenLocked(void (^block)(void))
+{
+    if ([NSThread isMainThread])
+    {
+        [CATransaction begin];
+        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+        block();
+        [CATransaction commit];
+    }
+    else
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            DoBlockWithScreenLocked(block);
+        });
+}
+
+- (void)updateSubtitleForTime:(CMTime)time
+{
+    if (self.subtitleCues == nil)
+        return;
+    double seconds = CMTimeGetSeconds(time);
+    NSString *text = @"";
+    double progress = 0.0;
+    for (SubtitleCue *cue in self.subtitleCues)
+    {
+        double start = CMTimeGetSeconds(cue.start);
+        double end   = CMTimeGetSeconds(cue.end);
+
+        if (seconds >= start && seconds <= end)
+        {
+            text = cue.text;
+            progress = (seconds - start) / (end - start);
+            break;
+        }
+    }
+
+    DoBlockWithScreenLocked(^{
+        self.subtitleLayer.string = text;
+        self.subTitleProgressLayer.strokeEnd = progress;
+        [self.subTitleProgressLayer setHidden:(progress <= 0)];
+    });
+}
+
+-(NSArray*)arrayOfUTTypes:(NSArray*)strings
+{
+    NSMutableArray *arr = [NSMutableArray array];
+    for (NSString *str in strings)
+    {
+        UTType *ut = [UTType typeWithIdentifier:str];
+        if (ut)
+            [arr addObject:ut];
+        else
+            NSLog(@"UTType %@ not found",str);
+    }
+    return arr;
+}
+
+-(void)setSRTPath:(NSString*)p
+{
+    [[NSUserDefaults standardUserDefaults]setObject:p forKey:@"srtpath"];
+}
+
+-(NSString*)SRTPath
+{
+    return [[NSUserDefaults standardUserDefaults]objectForKey:@"srtpath"];
+}
+
+
+- (IBAction)readSRT:(id)sender
+{
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setCanChooseDirectories:NO];
+    [panel setCanChooseFiles:YES];
+    [panel setAllowedContentTypes:[self arrayOfUTTypes:@[@"public.text"]]];
+    if ([self SRTPath])
+        [panel setDirectoryURL:[NSURL fileURLWithPath:[[self SRTPath]stringByDeletingLastPathComponent]]];
+    [panel beginSheetModalForWindow:[self mainWindow] completionHandler:^(NSInteger result)
+     {
+        if (result == NSModalResponseOK)
+        {
+            for (NSURL *url in [panel URLs])
+            {
+                [self loadSubtitlesFromURL:url];
+                break;
+            }
+        }
+    }];
+}
+
+-(IBAction)showAirplay:(id)sender
+{
+    NSWindow *w = [self.pickerHome window];
+    w.isVisible = !w.isVisible;
+}
+
+-(BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    SEL action = [menuItem action];
+    if (action == @selector(showAirplay:))
+    {
+        NSWindow *w = [self.pickerHome window];
+        if (w.isVisible)
+            [menuItem setState:NSControlStateValueOn];
+        else
+            [menuItem setState:NSControlStateValueOff];
+    }
+    return [super validateMenuItem:menuItem];
+
 }
 @end
