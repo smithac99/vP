@@ -8,6 +8,10 @@
 
 #import "VPContentView.h"
 
+@interface VPContentView ()
+
+@end
+
 @implementation VPContentView
 
 -(void)mouseMoved:(NSEvent *)event

@@ -17,6 +17,7 @@
 @interface Document ()
 {
 	float whRatio,wExtra,hExtra;
+    BOOL shouldHideSubtitleProgress;
 }
 @property (weak) IBOutlet NSSlider *timeSlider;
 @property (strong) IBOutlet NSWindow *mainWindow;
@@ -135,25 +136,29 @@ NSString* secsToHmst(CGFloat secs)
 	
 	self.playerLayer = [AVPlayerLayer playerLayerWithPlayer:_player];
 	self.playerLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
-	self.mainWindow.contentView.wantsLayer = YES;
+    CALayer *l = [CALayer layer];
+    l.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
+    self.mainWindow.contentView.wantsLayer = YES;
+    self.mainWindow.contentView.layer = l;
+
 	[self.playerLayer setFrame:self.mainWindow.contentView.bounds];
 	[self.mainWindow.contentView.layer addSublayer:self.playerLayer];
     
     self.subtitleLayer = [CATextLayer layer];
-    self.subtitleLayer.autoresizingMask = kCALayerWidthSizable|kCALayerMaxYMargin;
     CGRect bnds = self.mainWindow.contentView.bounds;
-    bnds = CGRectInset(bnds, 100, 0);
-    bnds.origin.y = 40;
-    bnds.size.height = 100;
-    [self.subtitleLayer setFrame:bnds];
+    //bnds = CGRectInset(bnds, 100, 0);
+    //bnds.origin.y = 40;
+    bnds.size.height = 180;
     self.subtitleLayer.alignmentMode = kCAAlignmentCenter;
     self.subtitleLayer.foregroundColor = NSColor.whiteColor.CGColor;
     self.subtitleLayer.backgroundColor = NSColor.clearColor.CGColor;
     self.subtitleLayer.shadowOpacity = 0.6;
     self.subtitleLayer.shadowRadius = 1.0;
-    self.subtitleLayer.fontSize = 30;
+    self.subtitleLayer.fontSize = 45;
     self.subtitleLayer.wrapped = YES;
     [self.mainWindow.contentView.layer addSublayer:self.subtitleLayer];
+    [self.subtitleLayer setFrame:bnds];
+    self.subtitleLayer.autoresizingMask = kCALayerWidthSizable;
 
     self.subTitleProgressLayer = [CAShapeLayer layer];
     self.subTitleProgressLayer.autoresizingMask = kCALayerMaxXMargin|kCALayerMinXMargin|kCALayerMaxYMargin;
@@ -204,6 +209,13 @@ NSString* secsToHmst(CGFloat secs)
     [self.pickerHome addSubview:_routePickerView];
     self.player.allowsExternalPlayback = YES;
     //self.player.usesExternalPlaybackWhileExternalScreenIsActive = YES;
+    self.mainWindow.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
+}
+
+-(IBAction)toggleSubtitleProgress:(id)sender
+{
+    shouldHideSubtitleProgress = !shouldHideSubtitleProgress;
+    [self.subTitleProgressLayer setHidden:shouldHideSubtitleProgress];
 }
 
 -(void)updateSizes
@@ -413,7 +425,7 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 
 - (NSSize)windowWillResize:(NSWindow *)window toSize:(NSSize)proposedFrameSize
 {
-	if ([window resizeFlags] & NSCommandKeyMask)
+    if ([window resizeFlags] & NSEventModifierFlagCommand)
 		return proposedFrameSize;
 	float newRatio  = (proposedFrameSize.width - wExtra) / (proposedFrameSize.height - hExtra);
 	if (newRatio > whRatio)
@@ -423,6 +435,9 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 	return proposedFrameSize;
 }
 
+- (void)windowWillEnterFullScreen:(NSNotification *)notification {
+    [self.mainWindow setFrame:self.mainWindow.screen.frame display:YES];
+}
 #pragma mark -
 
 -(NSImage*)imageAtCurrentTime
@@ -598,7 +613,7 @@ void DoBlockWithScreenLocked(void (^block)(void))
     DoBlockWithScreenLocked(^{
         self.subtitleLayer.string = text;
         self.subTitleProgressLayer.strokeEnd = progress;
-        [self.subTitleProgressLayer setHidden:(progress <= 0)];
+        [self.subTitleProgressLayer setHidden:(progress <= 0) || shouldHideSubtitleProgress];
     });
 }
 
@@ -664,6 +679,10 @@ void DoBlockWithScreenLocked(void (^block)(void))
             [menuItem setState:NSControlStateValueOn];
         else
             [menuItem setState:NSControlStateValueOff];
+    }
+    if (action == @selector(toggleSubtitleProgress:))
+    {
+        [menuItem setState:shouldHideSubtitleProgress? NSControlStateValueOff:NSControlStateValueOn];
     }
     return [super validateMenuItem:menuItem];
 

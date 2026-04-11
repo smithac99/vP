@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="24506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="24506"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -316,6 +316,13 @@
                             <menuItem title="Enter Full Screen" keyEquivalent="0" id="vNm-F2-Igg">
                                 <connections>
                                     <action selector="toggleFullScreen:" target="-1" id="Qnm-ug-5Xj"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="BW7-CV-U4i"/>
+                            <menuItem title="Subtitle Progress" id="hvD-gz-qtG">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="toggleSubtitleProgress:" target="-1" id="mdG-yy-huH"/>
                                 </connections>
                             </menuItem>
                         </items>
