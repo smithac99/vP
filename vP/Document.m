@@ -210,6 +210,7 @@ NSString* secsToHmst(CGFloat secs)
     self.player.allowsExternalPlayback = YES;
     //self.player.usesExternalPlaybackWhileExternalScreenIsActive = YES;
     self.mainWindow.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
+    [self.mainWindow setAcceptsMouseMovedEvents:YES];
 }
 
 -(IBAction)toggleSubtitleProgress:(id)sender

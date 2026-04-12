@@ -9,15 +9,59 @@
 #import "VPContentView.h"
 
 @interface VPContentView ()
-
+@property (nonatomic, strong) NSTimer *cursorTimer;
+@property (nonatomic, assign) BOOL cursorHidden;
 @end
 
 @implementation VPContentView
 
--(void)mouseMoved:(NSEvent *)event
+- (void)resetCursorTimer
 {
-	NSPoint coord = [self convertPoint:[event locationInWindow] fromView:nil];
-	NSLog(@"%g %g",coord.x,coord.y);
+    [self.cursorTimer invalidate];
+    
+    if (self.cursorHidden)
+    {
+        [NSCursor unhide];
+        self.cursorHidden = NO;
+    }
+
+    self.cursorTimer = [NSTimer scheduledTimerWithTimeInterval:3.0
+                                                        target:self
+                                                      selector:@selector(hideCursor)
+                                                     userInfo:nil
+                                                      repeats:NO];
 }
 
+- (void)hideCursor
+{
+    [NSCursor hide];
+    self.cursorHidden = YES;
+}
+
+-(void)mouseMoved
+{
+    [self resetCursorTimer];
+}
+
+- (void)mouseMoved:(NSEvent *)event
+{
+    NSPoint coord = [self convertPoint:[event locationInWindow] fromView:nil];
+    NSLog(@"view %g %g",coord.x,coord.y);
+    [self mouseMoved];
+}
+
+- (void)playbackDidStart
+{
+    [self resetCursorTimer];
+}
+
+- (void)playbackDidStop
+{
+    [self.cursorTimer invalidate];
+    self.cursorTimer = nil;
+    if (self.cursorHidden) {
+        [NSCursor unhide];
+        self.cursorHidden = NO;
+    }
+}
 @end

@@ -12,6 +12,9 @@
 
 -(void)mouseMoved:(NSEvent *)event
 {
+    NSPoint coord = [event locationInWindow];
+    NSLog(@"window %g %g",coord.x,coord.y);
+    [_playView mouseMoved];
 	[super mouseMoved:event];
 	
 }

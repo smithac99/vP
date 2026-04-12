@@ -109,5 +109,6 @@ CGFloat clamp01(CGFloat f)
 		//CGFloat frac = clamp01(coord.x / self.bounds.size.width);
 		self.mouseMoveBlock([event locationInWindow]);
 	}
+    [super mouseMoved:event];
 }
 @end

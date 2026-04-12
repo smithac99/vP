@@ -11,5 +11,7 @@
 
 @interface VPContentView : NSView
 
+-(void)mouseMoved;
+
 @end
 
