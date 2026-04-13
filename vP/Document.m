@@ -417,7 +417,7 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	if ([[self.playerView window] resizeFlags] & NSCommandKeyMask)
+    if ([[self.playerView window] resizeFlags] & NSEventModifierFlagCommand)
 	{
 		NSSize viewSz = [self.playerView frame].size;
 		whRatio = viewSz.width / viewSz.height;
@@ -480,7 +480,7 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
     [self.imageExportController prepareSavePanel:sp];
     [sp setTitle:@"Export Image"];
     [sp beginSheetModalForWindow:[self.playerView window] completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             int resolution = 72;
             [self.imageExportController updateSettingsFromControls:self.exportImageSettings];
