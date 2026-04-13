@@ -220,7 +220,7 @@ NSString* secsToHmst(CGFloat secs)
     NSInteger menuItemCount = [subtitleMenu numberOfItems];
     for (NSInteger i = 1;i < menuItemCount;i++)
     {
-        [subtitleMenu removeItemAtIndex:i];
+        [subtitleMenu removeItemAtIndex:1];
     }
     if ([_subtitleLanguageList count] > 0)
     {
