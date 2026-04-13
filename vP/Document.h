@@ -18,6 +18,7 @@
 @property NSMutableDictionary *exportImageSettings;
 @property (weak) IBOutlet NSView *pickerHome;
 @property AVRoutePickerView *routePickerView;
+@property NSArray* subtitleLanguageList;
 
 -(void)showPreviewWindow:(BOOL)sh;
 

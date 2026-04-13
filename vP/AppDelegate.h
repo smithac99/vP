@@ -10,6 +10,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+@property (weak) IBOutlet NSMenu *subtitleMenu;
 
 @end
 

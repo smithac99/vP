@@ -13,6 +13,7 @@
 #import "ControlsView.h"
 #import "SleepPreventer.h"
 #import "SubtitleCue.h"
+#import "AppDelegate.h"
 
 @interface Document ()
 {
@@ -213,6 +214,37 @@ NSString* secsToHmst(CGFloat secs)
     [self.mainWindow setAcceptsMouseMovedEvents:YES];
 }
 
+-(void)updateSubtitleMenu
+{
+    NSMenu *subtitleMenu = ((AppDelegate*)[NSApp delegate]).subtitleMenu;
+    NSInteger menuItemCount = [subtitleMenu numberOfItems];
+    for (NSInteger i = 1;i < menuItemCount;i++)
+    {
+        [subtitleMenu removeItemAtIndex:i];
+    }
+    if ([_subtitleLanguageList count] > 0)
+    {
+        SEL action = [[subtitleMenu itemAtIndex:0]action];
+        NSInteger tag = 1;
+        for (NSArray *arr in _subtitleLanguageList)
+        {
+            NSMenuItem *item = [[NSMenuItem alloc]init];
+            item.title = arr[1];
+            item.tag = tag;
+            item.action = action;
+            [subtitleMenu addItem:item];
+        }
+    }
+}
+
+- (void) windowDidBecomeMain:(NSNotification *) notification
+{
+    if ([notification object] == self.mainWindow)
+    {
+        
+    }
+}
+
 -(IBAction)toggleSubtitleProgress:(id)sender
 {
     shouldHideSubtitleProgress = !shouldHideSubtitleProgress;
@@ -319,6 +351,12 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 	[_player.currentItem.asset loadValuesAsynchronouslyForKeys:@[@"availableChapterLocales"] completionHandler:^{
 		self.chapterMetadataGroups = [_player.currentItem.asset chapterMetadataGroupsBestMatchingPreferredLanguages:[NSLocale preferredLanguages]];
 	}];
+    [self.player.currentItem.asset loadMediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicLegible completionHandler:^(AVMediaSelectionGroup * subtitleGroup, NSError * err) {
+        if (err)
+            NSLog(@"%@",[err localizedDescription]);
+        else
+            [self buildSubtitleLanguageList:subtitleGroup];
+    }];
 	
 	return YES;
 }
@@ -670,6 +708,27 @@ void DoBlockWithScreenLocked(void (^block)(void))
     w.isVisible = !w.isVisible;
 }
 
+-(IBAction)subtitleMenuHit:(id)sender
+{
+    
+}
+
+-(void)buildSubtitleLanguageList:(AVMediaSelectionGroup*)subtitleGroup
+{
+    NSMutableArray *langs = [NSMutableArray array];
+    for (AVMediaSelectionOption *option in subtitleGroup.options)
+    {
+        NSLog(@"Subtitle track: %@ (%@)",
+            option.displayName,
+            option.locale.localeIdentifier);
+        [langs addObject:@[option.locale.localeIdentifier,option.displayName]];
+    }
+    _subtitleLanguageList = langs;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateSubtitleMenu];
+    });
+}
+
 -(BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
     SEL action = [menuItem action];
@@ -684,6 +743,10 @@ void DoBlockWithScreenLocked(void (^block)(void))
     if (action == @selector(toggleSubtitleProgress:))
     {
         [menuItem setState:shouldHideSubtitleProgress? NSControlStateValueOff:NSControlStateValueOn];
+    }
+    if (action == @selector(subtitleMenuHit:))
+    {
+        
     }
     return [super validateMenuItem:menuItem];
 

@@ -11,7 +11,11 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Voe-Tx-rLC" customClass="AppDelegate"/>
+        <customObject id="Voe-Tx-rLC" customClass="AppDelegate">
+            <connections>
+                <outlet property="subtitleMenu" destination="8j1-NB-lTg" id="d03-ef-5Yl"/>
+            </connections>
+        </customObject>
         <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
             <items>
@@ -319,11 +323,25 @@
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="BW7-CV-U4i"/>
-                            <menuItem title="Subtitle Progress" id="hvD-gz-qtG">
+                            <menuItem title="Subtitle Progress" id="fu6-2j-JdB">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="toggleSubtitleProgress:" target="-1" id="mdG-yy-huH"/>
+                                    <action selector="toggleSubtitleProgress:" target="-1" id="dHI-ml-aNM"/>
                                 </connections>
+                            </menuItem>
+                            <menuItem isSeparatorItem="YES" id="Tcv-qk-FCU"/>
+                            <menuItem title="Subtitles" id="TNo-XU-zzz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <menu key="submenu" title="Subtitles" id="8j1-NB-lTg">
+                                    <items>
+                                        <menuItem title="Off" id="KbK-iC-mxt">
+                                            <modifierMask key="keyEquivalentModifierMask"/>
+                                            <connections>
+                                                <action selector="subtitleMenuHit:" target="-1" id="SFC-hA-huj"/>
+                                            </connections>
+                                        </menuItem>
+                                    </items>
+                                </menu>
                             </menuItem>
                         </items>
                     </menu>
