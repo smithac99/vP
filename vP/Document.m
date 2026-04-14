@@ -15,6 +15,10 @@
 #import "SubtitleCue.h"
 #import "AppDelegate.h"
 
+@implementation Subtitle
+
+@end
+
 @interface Document ()
 {
 	float whRatio,wExtra,hExtra;
@@ -226,13 +230,14 @@ NSString* secsToHmst(CGFloat secs)
     {
         SEL action = [[subtitleMenu itemAtIndex:0]action];
         NSInteger tag = 1;
-        for (NSArray *arr in _subtitleLanguageList)
+        for (Subtitle *st in _subtitleLanguageList)
         {
             NSMenuItem *item = [[NSMenuItem alloc]init];
-            item.title = arr[1];
+            item.title = st.desc;
             item.tag = tag;
             item.action = action;
             [subtitleMenu addItem:item];
+            tag++;
         }
     }
 }
@@ -352,6 +357,7 @@ NSInteger clampint(NSInteger from,NSInteger to,NSInteger val)
 		self.chapterMetadataGroups = [_player.currentItem.asset chapterMetadataGroupsBestMatchingPreferredLanguages:[NSLocale preferredLanguages]];
 	}];
     [self.player.currentItem.asset loadMediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicLegible completionHandler:^(AVMediaSelectionGroup * subtitleGroup, NSError * err) {
+        self.subtitleGroup = subtitleGroup;
         if (err)
             NSLog(@"%@",[err localizedDescription]);
         else
@@ -710,7 +716,11 @@ void DoBlockWithScreenLocked(void (^block)(void))
 
 -(IBAction)subtitleMenuHit:(id)sender
 {
-    
+    NSInteger idx = [sender tag] - 1;
+    AVMediaSelectionOption *option = nil;
+    if (idx >= 0)
+        option = self.subtitleLanguageList[idx].option;
+    [self.player.currentItem selectMediaOption:option inMediaSelectionGroup:self.subtitleGroup];
 }
 
 -(void)buildSubtitleLanguageList:(AVMediaSelectionGroup*)subtitleGroup
@@ -721,7 +731,11 @@ void DoBlockWithScreenLocked(void (^block)(void))
         NSLog(@"Subtitle track: %@ (%@)",
             option.displayName,
             option.locale.localeIdentifier);
-        [langs addObject:@[option.locale.localeIdentifier,option.displayName]];
+        Subtitle *st = [[Subtitle alloc]init];
+        st.lang = option.locale.localeIdentifier;
+        st.desc = option.displayName;
+        st.option = option;
+        [langs addObject:st];
     }
     _subtitleLanguageList = langs;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -746,7 +760,7 @@ void DoBlockWithScreenLocked(void (^block)(void))
     }
     if (action == @selector(subtitleMenuHit:))
     {
-        
+        NSInteger idx = [menuItem tag] - 1;
     }
     return [super validateMenuItem:menuItem];
 

@@ -45,8 +45,8 @@
 
 - (void)mouseMoved:(NSEvent *)event
 {
-    NSPoint coord = [self convertPoint:[event locationInWindow] fromView:nil];
-    NSLog(@"view %g %g",coord.x,coord.y);
+    //NSPoint coord = [self convertPoint:[event locationInWindow] fromView:nil];
+    //NSLog(@"view %g %g",coord.x,coord.y);
     [self mouseMoved];
 }
 

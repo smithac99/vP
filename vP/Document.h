@@ -12,14 +12,21 @@
 
 @class ImageExportController;
 
+@interface Subtitle : NSObject
+
+@property NSString *lang,*desc;
+@property AVMediaSelectionOption *option;
+
+@end
+
 @interface Document : NSDocument<AVRoutePickerViewDelegate>
 
 @property IBOutlet ImageExportController *imageExportController;
 @property NSMutableDictionary *exportImageSettings;
 @property (weak) IBOutlet NSView *pickerHome;
 @property AVRoutePickerView *routePickerView;
-@property NSArray* subtitleLanguageList;
-
+@property NSArray<Subtitle*>* subtitleLanguageList;
+@property AVMediaSelectionGroup *subtitleGroup;
 -(void)showPreviewWindow:(BOOL)sh;
 
 @end
