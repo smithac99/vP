@@ -218,6 +218,20 @@ NSString* secsToHmst(CGFloat secs)
     [self.mainWindow setAcceptsMouseMovedEvents:YES];
 }
 
+-(void)updateMenuTicks
+{
+    NSMenu *subtitleMenu = ((AppDelegate*)[NSApp delegate]).subtitleMenu;
+    NSArray *arr = [subtitleMenu itemArray];
+    NSArray *menuItems = [arr subarrayWithRange:NSMakeRange(1, [arr count] - 1)];
+    for (NSInteger i = 0; i < [menuItems count];i++)
+    {
+        NSMenuItem *menuItem = menuItems[i];
+        menuItem.state = (i == _currentSubtitleIndex)? NSControlStateValueOn : NSControlStateValueOff;
+    }
+    NSMenuItem *offItem = [subtitleMenu itemAtIndex:0];
+    offItem.state = (_currentSubtitleIndex < 0)? NSControlStateValueOn : NSControlStateValueOff;
+}
+
 -(void)updateSubtitleMenu
 {
     NSMenu *subtitleMenu = ((AppDelegate*)[NSApp delegate]).subtitleMenu;
@@ -229,7 +243,7 @@ NSString* secsToHmst(CGFloat secs)
     if ([_subtitleLanguageList count] > 0)
     {
         SEL action = [[subtitleMenu itemAtIndex:0]action];
-        NSInteger tag = 1;
+        NSInteger tag = 0;
         for (Subtitle *st in _subtitleLanguageList)
         {
             NSMenuItem *item = [[NSMenuItem alloc]init];
@@ -240,13 +254,14 @@ NSString* secsToHmst(CGFloat secs)
             tag++;
         }
     }
+    [self updateMenuTicks];
 }
 
 - (void) windowDidBecomeMain:(NSNotification *) notification
 {
     if ([notification object] == self.mainWindow)
     {
-        
+        [self updateSubtitleMenu];
     }
 }
 
@@ -716,11 +731,12 @@ void DoBlockWithScreenLocked(void (^block)(void))
 
 -(IBAction)subtitleMenuHit:(id)sender
 {
-    NSInteger idx = [sender tag] - 1;
+    self.currentSubtitleIndex = [sender tag];
     AVMediaSelectionOption *option = nil;
-    if (idx >= 0)
-        option = self.subtitleLanguageList[idx].option;
-    [self.player.currentItem selectMediaOption:option inMediaSelectionGroup:self.subtitleGroup];
+    if (self.currentSubtitleIndex >= 0)
+        option = _subtitleLanguageList[self.currentSubtitleIndex].option;
+    [self.player.currentItem selectMediaOption:option inMediaSelectionGroup:_subtitleGroup];
+    [self updateMenuTicks];
 }
 
 -(void)buildSubtitleLanguageList:(AVMediaSelectionGroup*)subtitleGroup

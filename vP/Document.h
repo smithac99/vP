@@ -27,6 +27,8 @@
 @property AVRoutePickerView *routePickerView;
 @property NSArray<Subtitle*>* subtitleLanguageList;
 @property AVMediaSelectionGroup *subtitleGroup;
+@property NSInteger currentSubtitleIndex;
+
 -(void)showPreviewWindow:(BOOL)sh;
 
 @end

@@ -25,7 +25,7 @@
         self.cursorHidden = NO;
     }
 
-    self.cursorTimer = [NSTimer scheduledTimerWithTimeInterval:3.0
+    self.cursorTimer = [NSTimer scheduledTimerWithTimeInterval:8.0
                                                         target:self
                                                       selector:@selector(hideCursor)
                                                      userInfo:nil

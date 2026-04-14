@@ -334,7 +334,7 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <menu key="submenu" title="Subtitles" id="8j1-NB-lTg">
                                     <items>
-                                        <menuItem title="Off" id="KbK-iC-mxt">
+                                        <menuItem title="Off" tag="-1" id="KbK-iC-mxt">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="subtitleMenuHit:" target="-1" id="SFC-hA-huj"/>
